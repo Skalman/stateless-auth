@@ -82,3 +82,27 @@ function stateless_auth_get_context($token) {
 	}
 	return $parts[2];
 }
+
+/**
+ * Creates a form input, used as an XSRF guard, by default with the
+ * name 'xsrf_token'.
+ */
+function stateless_auth_xsrf_create($secret_key, $context, $time = 600,
+		$name = 'xsrf_token', $xhtml = true) {
+
+	return sprintf('<input type="hidden" name="%s" value="%s"%s>',
+		htmlspecialchars($name),
+		htmlspecialchars(stateless_auth_create($secret_key, $context, $time)),
+		($xhtml ? ' /' : ''));
+}
+
+/**
+ * Verifies that the correct XSRF token was used. If $token is not
+ * given, $_POST['xsrf_token'] is used.
+ */
+function stateless_auth_xsrf_verify($secret_key, $context, $token = null) {
+	if (func_num_args() === 2) {
+		$token = @$_POST['xsrf_token'];
+	}
+	return stateless_auth_verify($secret_key, $context, $token);
+}

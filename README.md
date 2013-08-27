@@ -19,7 +19,7 @@ There are a number of concepts that are important to understand when using *Stat
 	- if it's used in a certain form, include the name of the form (e.g. `edit profile:John Dow`)
 	- if it's used for signing in, state that (e.g. `login:John Doe`)
 * **expiry time**: A token should always have an expiry time, after which it will no longer be valid. Once a user gets the token, waiting for expiry is the only (good) way to invalidate it. Other ways are to change the secret key (invalidates all tokens) or to start using a different context (may be a hassle).
-* **[XSRF][]** (cross-site request forgery): A type of website exploit where an attacker tricks a user to submit a form to another website.
+* **[XSRF][]** (cross-site request forgery): A type of website exploit where an attacker tricks a user to submit a form to another website. *Stateless auth* is especially designed with this in mind, and has a couple of useful functions to simplify it further: `stateless_auth_xsrf_create` and `stateless_auth_xsrf_verify`.
 
   [XSRF]: https://en.wikipedia.org/wiki/Cross-site_request_forgery
 
@@ -27,7 +27,7 @@ There are a number of concepts that are important to understand when using *Stat
 API
 ---
 
-<code>string **stateless\_auth\_create**(string $secret_key, string $context, [number $time=60])</code>
+<code>string **stateless\_auth\_create**(string $secret_key, string $context, [int $time=60])</code>
 
 Creates a token that the server can authenticate. The token is completely stateless, and all necessary information is stored inside the token. This means that once a token is created, it can only be invalidated by expiring.
 
@@ -66,6 +66,35 @@ Gets the context for a given token.
 * `$token`
   The token to get the context for.
 * Returns the context as the number of seconds since the Unix Epoch. If it cannot be extracted, `false` is returned.
+
+<code>string **stateless\_auth\_xsrf\_create**(string $secret\_key, string $context, [int $time=600, string $name='xsrf\_token', bool $xhtml=true])</code>
+
+Creates a form `<input>`, used as an XSRF guard, by default with the name 'xsrf_token'. It is a wrapper around `stateless_auth_create()`.
+
+* `$secret_key`
+  The server secret.
+* `$context`
+  The context in which the token will be valid.
+* `$time=600`
+  The number of seconds for which the token will be valid.
+* `$name='xsrf_token'`
+  The `<input>` name.
+* `$xhtml=true`
+  Whether it is a self-closing tag or not: `<input />` vs. `<input>`
+* Returns the created token in an input element, e.g. `<input type="hidden" name="xsrf_token" value="..." />`.
+
+<code>bool **stateless\_auth\_xsrf\_verify**(string $secret\_key, string $context, [string $token=$\_POST['xsrf\_token']])</code>
+
+Checks whether a token is valid. It is a wrapper around `stateless_auth_verify()`, using `$_POST['xsrf_token']` by default.
+
+* `$secret_key`
+  The same secret as was used to create the token.
+* `$context`
+  The same context as was used to create the token.
+* `$token=$_POST['xsrf_token']`
+  The token to be checked.
+* Returns `true` if the token is valid for the given context, else `false`.
+
 
 
 Tests
