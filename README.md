@@ -27,7 +27,9 @@ There are a number of concepts that are important to understand when using *Stat
 API
 ---
 
-<code>string **stateless\_auth\_create**(string $secret_key, string $context, [int $time=60])</code>
+### stateless\_auth\_create()
+
+<code>string **stateless\_auth\_create**(string $secret\_key, string $context, [int $time=60])</code>
 
 Creates a token that the server can authenticate. The token is completely stateless, and all necessary information is stored inside the token. This means that once a token is created, it can only be invalidated by expiring.
 
@@ -39,7 +41,10 @@ Creates a token that the server can authenticate. The token is completely statel
   The number of seconds for which the token will be valid.
 * Returns the token as a string, containing a hash, the token's expiry time and `$context`.
 
-<code>bool **stateless\_auth\_verify**(string $secret_key, string $context, string $token)</code>
+
+### stateless\_auth\_verify()
+
+<code>bool **stateless\_auth\_verify**(string $secret\_key, string $context, string $token)</code>
 
 Checks whether a token is valid. If it is misformatted, the expiry time has passed, or the token is valid only for another context, it is considered invalid.
 
@@ -51,6 +56,9 @@ Checks whether a token is valid. If it is misformatted, the expiry time has pass
   The token to be checked.
 * Returns `true` if the token is valid for the given context, else `false`.
 
+
+### stateless\_auth\_get\_expiry()
+
 <code>mixed **stateless\_auth\_get\_expiry**(string $token)</code>
 
 Gets the expiry time for a given token.
@@ -59,6 +67,9 @@ Gets the expiry time for a given token.
   The token to get the expiry time for.
 * Returns the expiry time as the number of seconds since the Unix Epoch. If it cannot be extracted, `false` is returned.
 
+
+### stateless\_auth\_get\_context()
+
 <code>mixed **stateless\_auth\_get\_context**(string $token)</code>
 
 Gets the context for a given token.
@@ -66,6 +77,8 @@ Gets the context for a given token.
 * `$token`
   The token to get the context for.
 * Returns the context as the number of seconds since the Unix Epoch. If it cannot be extracted, `false` is returned.
+
+### stateless\_auth\_xsrf\_create()
 
 <code>string **stateless\_auth\_xsrf\_create**(string $secret\_key, string $context, [int $time=600, string $name='xsrf\_token', bool $xhtml=true])</code>
 
@@ -82,6 +95,9 @@ Creates a form `<input>`, used as an XSRF guard, by default with the name 'xsrf_
 * `$xhtml=true`
   Whether it is a self-closing tag or not: `<input />` vs. `<input>`
 * Returns the created token in an input element, e.g. `<input type="hidden" name="xsrf_token" value="..." />`.
+
+
+### stateless\_auth\_xsrf\_verify()
 
 <code>bool **stateless\_auth\_xsrf\_verify**(string $secret\_key, string $context, [string $token=$\_POST['xsrf\_token']])</code>
 
